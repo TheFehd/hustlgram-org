@@ -1,11 +1,27 @@
-import { SITE, NAV_LINKS } from "../constants/content";
+import { motion, useScroll, useMotionValueEvent } from "framer-motion";
+import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { SITE } from "../constants/content";
 
-export default function Navbar({ colors, scrollY, dark, onToggleTheme }) {
+const NAV_ITEMS = [
+  { label: "Services", path: "/services" },
+  { label: "Work", path: "/work" },
+  { label: "About", path: "/about" },
+];
+
+export default function Navbar({ colors, dark, onToggleTheme }) {
   const c = colors;
-  const scrolled = scrollY > 50;
+  const [scrolled, setScrolled] = useState(false);
+  const { scrollY } = useScroll();
+  const { pathname } = useLocation();
+
+  useMotionValueEvent(scrollY, "change", (y) => setScrolled(y > 50));
 
   return (
-    <nav
+    <motion.nav
+      initial={{ y: -20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       style={{
         position: "fixed",
         top: 0,
@@ -19,18 +35,25 @@ export default function Navbar({ colors, scrollY, dark, onToggleTheme }) {
         background: scrolled
           ? dark
             ? "rgba(5,31,32,0.85)"
-            : "rgba(243,249,244,0.85)"
+            : "rgba(242,248,243,0.85)"
           : "transparent",
         backdropFilter: scrolled ? "blur(24px) saturate(180%)" : "none",
         WebkitBackdropFilter: scrolled ? "blur(24px) saturate(180%)" : "none",
         borderBottom: scrolled
           ? `1px solid ${c.border}`
           : "1px solid transparent",
-        transition: "all 0.5s",
       }}
     >
       {/* Logo */}
-      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+      <Link
+        to="/"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          textDecoration: "none",
+        }}
+      >
         <span
           style={{
             fontFamily: "'Syne'",
@@ -50,31 +73,45 @@ export default function Navbar({ colors, scrollY, dark, onToggleTheme }) {
             background: c.accent,
           }}
         />
-      </div>
+      </Link>
 
       {/* Right side */}
       <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
         <div className="nav-links" style={{ display: "flex", gap: 20 }}>
-          {NAV_LINKS.map((label) => (
-            <a
-              key={label}
-              className="hg-link"
-              style={{
-                fontSize: 12,
-                letterSpacing: 1,
-                opacity: 0.5,
-                cursor: "pointer",
-                textTransform: "uppercase",
-                fontFamily: "'Syne'",
-              }}
-            >
-              {label}
-            </a>
-          ))}
+          {NAV_ITEMS.map(({ label, path }) => {
+            const active = pathname === path;
+            return (
+              <Link
+                key={label}
+                to={path}
+                style={{
+                  fontSize: 12,
+                  letterSpacing: 1,
+                  opacity: active ? 1 : 0.5,
+                  cursor: "pointer",
+                  textTransform: "uppercase",
+                  fontFamily: "'Syne'",
+                  color: c.fg,
+                  textDecoration: "none",
+                  transition: "opacity 0.3s",
+                }}
+                onMouseEnter={(e) => {
+                  if (!active) e.currentTarget.style.opacity = "0.8";
+                }}
+                onMouseLeave={(e) => {
+                  if (!active) e.currentTarget.style.opacity = "0.5";
+                }}
+              >
+                {label}
+              </Link>
+            );
+          })}
         </div>
 
         {/* Theme toggle */}
-        <button
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.92 }}
           onClick={onToggleTheme}
           style={{
             width: 32,
@@ -88,32 +125,34 @@ export default function Navbar({ colors, scrollY, dark, onToggleTheme }) {
             alignItems: "center",
             justifyContent: "center",
             fontSize: 13,
-            transition: "all 0.3s",
           }}
         >
           {dark ? "☀" : "☾"}
-        </button>
+        </motion.button>
 
         {/* CTA button */}
-        <button
-          style={{
-            fontFamily: "'Syne'",
-            fontSize: 11,
-            fontWeight: 600,
-            letterSpacing: 1.2,
-            textTransform: "uppercase",
-            padding: "9px 20px",
-            borderRadius: 100,
-            border: "none",
-            background: c.accent,
-            color: dark ? "#051F20" : "#ffffff",
-            cursor: "pointer",
-            transition: "all 0.3s",
-          }}
-        >
-          Let's talk
-        </button>
+        <Link to="/about" style={{ textDecoration: "none" }}>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.97 }}
+            style={{
+              fontFamily: "'Syne'",
+              fontSize: 11,
+              fontWeight: 600,
+              letterSpacing: 1.2,
+              textTransform: "uppercase",
+              padding: "9px 20px",
+              borderRadius: 100,
+              border: "none",
+              background: c.accent,
+              color: dark ? "#051F20" : "#ffffff",
+              cursor: "pointer",
+            }}
+          >
+            Let's talk
+          </motion.button>
+        </Link>
       </div>
-    </nav>
+    </motion.nav>
   );
 }

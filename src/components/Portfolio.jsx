@@ -1,13 +1,37 @@
-import { useInView } from "../hooks/useInView";
+import { motion } from "framer-motion";
 import { PORTFOLIO } from "../constants/content";
+
+const ease = [0.22, 1, 0.36, 1];
+
+const container = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
+};
+
+const fadeUp = {
+  hidden: { y: 40, opacity: 0 },
+  visible: { y: 0, opacity: 1, transition: { duration: 0.9, ease } },
+};
+
+const rowVariant = (i) => ({
+  hidden: { y: 30, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: { duration: 0.7, ease, delay: 0.1 + i * 0.1 },
+  },
+});
 
 export default function Portfolio({ colors }) {
   const c = colors;
-  const [ref, visible] = useInView(0.1);
 
   return (
-    <section
-      ref={ref}
+    <motion.section
+      id="work"
+      variants={container}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.1 }}
       style={{
         padding: "clamp(80px, 12vw, 160px) clamp(20px, 5vw, 64px)",
         maxWidth: 960,
@@ -15,14 +39,7 @@ export default function Portfolio({ colors }) {
       }}
     >
       {/* Section header */}
-      <div
-        style={{
-          marginBottom: 56,
-          opacity: visible ? 1 : 0,
-          transform: visible ? "translateY(0)" : "translateY(40px)",
-          transition: "all 0.9s cubic-bezier(0.22,1,0.36,1)",
-        }}
-      >
+      <motion.div variants={fadeUp} style={{ marginBottom: 56 }}>
         <span
           style={{
             fontFamily: "'Fira Code', monospace",
@@ -44,16 +61,18 @@ export default function Portfolio({ colors }) {
             lineHeight: 1.05,
           }}
         >
-          Recent <em style={{ fontStyle: "italic", color: c.accent }}>projects.</em>
+          Results, not just{" "}
+          <em style={{ fontStyle: "italic", color: c.accent }}>screenshots.</em>
         </h2>
-      </div>
+      </motion.div>
 
       {/* Project list */}
       <div style={{ display: "flex", flexDirection: "column" }}>
         {PORTFOLIO.map((item, i) => (
-          <div
+          <motion.div
             key={i}
             className="p-row"
+            variants={rowVariant(i)}
             style={{
               display: "flex",
               alignItems: "center",
@@ -61,9 +80,8 @@ export default function Portfolio({ colors }) {
               padding: "28px 0",
               borderBottom: `1px solid ${c.border}`,
               cursor: "pointer",
-              opacity: visible ? 1 : 0,
-              transform: visible ? "translateY(0)" : "translateY(30px)",
-              transition: `all 0.7s cubic-bezier(0.22,1,0.36,1) ${0.1 + i * 0.1}s`,
+              flexWrap: "wrap",
+              gap: 12,
             }}
           >
             <div
@@ -72,6 +90,7 @@ export default function Portfolio({ colors }) {
                 alignItems: "baseline",
                 gap: "clamp(12px, 3vw, 28px)",
                 flex: 1,
+                minWidth: 0,
               }}
             >
               <span
@@ -81,11 +100,12 @@ export default function Portfolio({ colors }) {
                   color: c.fgDim,
                   letterSpacing: 1,
                   minWidth: 28,
+                  flexShrink: 0,
                 }}
               >
                 {String(i + 1).padStart(2, "0")}
               </span>
-              <div>
+              <div style={{ minWidth: 0 }}>
                 <h3
                   style={{
                     fontFamily: "'Instrument Serif', serif",
@@ -113,6 +133,23 @@ export default function Portfolio({ colors }) {
             </div>
 
             <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              {/* Result tag */}
+              <span
+                style={{
+                  fontFamily: "'Fira Code', monospace",
+                  fontSize: 10,
+                  letterSpacing: 0.5,
+                  padding: "5px 12px",
+                  borderRadius: 100,
+                  background: c.accent,
+                  color: c.bg,
+                  textTransform: "uppercase",
+                  whiteSpace: "nowrap",
+                  fontWeight: 500,
+                }}
+              >
+                {item.result}
+              </span>
               <span
                 className="desktop-only"
                 style={{
@@ -129,24 +166,30 @@ export default function Portfolio({ colors }) {
                 height="20"
                 viewBox="0 0 20 20"
                 fill="none"
-                style={{ color: c.accent }}
+                style={{ color: c.accent, flexShrink: 0 }}
               >
-                <path d="M5 15L15 5M15 5H8M15 5V12" stroke="currentColor" strokeWidth="1.2" />
+                <path
+                  d="M5 15L15 5M15 5H8M15 5V12"
+                  stroke="currentColor"
+                  strokeWidth="1.2"
+                />
               </svg>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
 
       {/* View all button */}
-      <div
-        style={{
-          marginTop: 40,
-          opacity: visible ? 1 : 0,
-          transition: "all 0.6s ease 0.5s",
+      <motion.div
+        variants={{
+          hidden: { opacity: 0 },
+          visible: { opacity: 1, transition: { duration: 0.6, delay: 0.5 } },
         }}
+        style={{ marginTop: 40 }}
       >
-        <button
+        <motion.button
+          whileHover={{ scale: 1.04, borderColor: c.accent }}
+          whileTap={{ scale: 0.97 }}
           style={{
             fontFamily: "'Syne'",
             fontSize: 12,
@@ -162,17 +205,18 @@ export default function Portfolio({ colors }) {
             display: "inline-flex",
             alignItems: "center",
             gap: 8,
-            transition: "all 0.3s",
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.borderColor = c.accent)}
-          onMouseLeave={(e) => (e.currentTarget.style.borderColor = c.border)}
         >
           View all work
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-            <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" strokeWidth="1.2" />
+            <path
+              d="M3 8H13M13 8L9 4M13 8L9 12"
+              stroke="currentColor"
+              strokeWidth="1.2"
+            />
           </svg>
-        </button>
-      </div>
-    </section>
+        </motion.button>
+      </motion.div>
+    </motion.section>
   );
 }

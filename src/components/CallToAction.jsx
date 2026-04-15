@@ -1,12 +1,13 @@
-import { useInView } from "../hooks/useInView";
+import { motion } from "framer-motion";
+
+const ease = [0.22, 1, 0.36, 1];
 
 export default function CallToAction({ colors, dark }) {
   const c = colors;
-  const [ref, visible] = useInView(0.2);
 
   return (
     <section
-      ref={ref}
+      id="contact"
       style={{
         padding: "clamp(80px, 12vw, 140px) clamp(20px, 5vw, 64px)",
         borderTop: `1px solid ${c.border}`,
@@ -26,18 +27,17 @@ export default function CallToAction({ colors, dark }) {
           maxWidth: 500,
           maxHeight: 500,
           borderRadius: "50%",
-          background: `radial-gradient(circle, ${c.accent}06 0%, transparent 60%)`,
+          background: `radial-gradient(circle, ${c.accent}06 0%, transparent 65%)`,
           pointerEvents: "none",
         }}
       />
 
-      <div
-        style={{
-          opacity: visible ? 1 : 0,
-          transform: visible ? "translateY(0)" : "translateY(48px)",
-          transition: "all 1s cubic-bezier(0.22,1,0.36,1)",
-          position: "relative",
-        }}
+      <motion.div
+        initial={{ y: 48, opacity: 0 }}
+        whileInView={{ y: 0, opacity: 1 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 1, ease }}
+        style={{ position: "relative" }}
       >
         <span
           style={{
@@ -62,9 +62,10 @@ export default function CallToAction({ colors, dark }) {
             margin: "0 0 16px",
           }}
         >
-          Let's build
+          Your next client is
           <br />
-          something <em style={{ fontStyle: "italic", color: c.accent }}>great.</em>
+          one system{" "}
+          <em style={{ fontStyle: "italic", color: c.accent }}>away.</em>
         </h2>
         <p
           style={{
@@ -75,9 +76,16 @@ export default function CallToAction({ colors, dark }) {
             lineHeight: 1.7,
           }}
         >
-          Book a free strategy call. No pressure, just ideas.
+          Book a free 15-minute strategy call. No pitch, no pressure — just a
+          clear plan to grow your business.
         </p>
-        <button
+        <motion.button
+          whileHover={{
+            scale: 1.04,
+            boxShadow: `0 0 48px ${c.accent}44`,
+          }}
+          whileTap={{ scale: 0.97 }}
+          transition={{ type: "spring", stiffness: 400, damping: 25 }}
           style={{
             fontFamily: "'Syne'",
             fontSize: 13,
@@ -90,20 +98,11 @@ export default function CallToAction({ colors, dark }) {
             background: c.accent,
             color: dark ? "#051F20" : "#ffffff",
             cursor: "pointer",
-            transition: "all 0.3s",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = "scale(1.04)";
-            e.currentTarget.style.boxShadow = `0 0 48px ${c.accent}44`;
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = "scale(1)";
-            e.currentTarget.style.boxShadow = "none";
           }}
         >
           Book a free call
-        </button>
-      </div>
+        </motion.button>
+      </motion.div>
     </section>
   );
 }

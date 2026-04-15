@@ -1,6 +1,7 @@
 /**
  * Hustlgram Color System
  * Emerald depth palette — dark and light variants.
+ * Every color comes from the uploaded palette swatches.
  */
 
 export const DARK = {
@@ -17,8 +18,8 @@ export const DARK = {
 };
 
 export const LIGHT = {
-  bg: "#f3f9f4",
-  bgAlt: "#e8f4ea",
+  bg: "#f2f8f3",
+  bgAlt: "#e6f1e8",
   surface: "#DAF1DE",
   fg: "#051F20",
   fgMuted: "#235347",

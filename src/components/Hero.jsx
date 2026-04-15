@@ -1,7 +1,21 @@
+import { motion } from "framer-motion";
 import { SITE, HERO } from "../constants/content";
 
-export default function Hero({ colors, loaded }) {
+const ease = [0.22, 1, 0.36, 1];
+
+const fadeUp = (delay) => ({
+  hidden: { y: 24, opacity: 0 },
+  visible: { y: 0, opacity: 1, transition: { duration: 0.9, ease, delay } },
+});
+
+const wordReveal = (delay) => ({
+  hidden: { y: "100%", opacity: 0 },
+  visible: { y: 0, opacity: 1, transition: { duration: 1, ease, delay } },
+});
+
+export default function Hero({ colors }) {
   const c = colors;
+  const words = HERO.headline.split(" ");
 
   return (
     <section
@@ -25,19 +39,17 @@ export default function Hero({ colors, loaded }) {
           maxWidth: 700,
           maxHeight: 700,
           borderRadius: "50%",
-          background: `radial-gradient(circle, ${c.accent}08 0%, transparent 65%)`,
+          background: `radial-gradient(circle, ${c.accent}06 0%, transparent 65%)`,
           pointerEvents: "none",
         }}
       />
 
       {/* Tagline */}
-      <div
-        style={{
-          opacity: loaded ? 0.35 : 0,
-          transform: loaded ? "translateY(0)" : "translateY(16px)",
-          transition: "all 0.8s cubic-bezier(0.22,1,0.36,1) 0.2s",
-          marginBottom: 28,
-        }}
+      <motion.div
+        variants={fadeUp(0.2)}
+        initial="hidden"
+        animate="visible"
+        style={{ marginBottom: 28, opacity: 0.35 }}
       >
         <span
           style={{
@@ -50,79 +62,61 @@ export default function Hero({ colors, loaded }) {
         >
           {SITE.tagline}
         </span>
-      </div>
+      </motion.div>
 
-      {/* Headline */}
+      {/* Headline — staggered word reveal */}
       <h1
         style={{
           fontFamily: "'Instrument Serif', serif",
-          fontSize: "clamp(48px, 12vw, 110px)",
+          fontSize: "clamp(36px, 9vw, 80px)",
           fontWeight: 400,
-          lineHeight: 0.95,
-          letterSpacing: "-0.04em",
+          lineHeight: 1.1,
+          letterSpacing: "-0.03em",
           margin: 0,
-          maxWidth: 900,
+          maxWidth: 800,
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "0 0.3em",
         }}
       >
-        <span style={{ display: "block", overflow: "hidden" }}>
-          <span
-            style={{
-              display: "block",
-              opacity: loaded ? 1 : 0,
-              transform: loaded ? "translateY(0)" : "translateY(100%)",
-              transition: "all 1s cubic-bezier(0.22,1,0.36,1) 0.3s",
-            }}
-          >
-            {HERO.headlineTop}
+        {words.map((word, i) => (
+          <span key={i} style={{ overflow: "hidden", display: "inline-flex" }}>
+            <motion.span
+              variants={wordReveal(0.3 + i * 0.06)}
+              initial="hidden"
+              animate="visible"
+              style={{ display: "inline-block" }}
+            >
+              {word}
+            </motion.span>
           </span>
-        </span>
-        <span style={{ display: "block", overflow: "hidden" }}>
-          <span
-            style={{
-              display: "inline-block",
-              opacity: loaded ? 1 : 0,
-              transform: loaded ? "translateY(0)" : "translateY(100%)",
-              transition: "all 1s cubic-bezier(0.22,1,0.36,1) 0.45s",
-            }}
-          >
-            {HERO.headlineBottom}{" "}
-          </span>
-          <em
-            style={{
-              fontStyle: "italic",
-              display: "inline-block",
-              opacity: loaded ? 1 : 0,
-              transform: loaded ? "translateY(0)" : "translateY(100%)",
-              transition: "all 1s cubic-bezier(0.22,1,0.36,1) 0.55s",
-              color: c.accent,
-            }}
-          >
-            {HERO.headlineAccent}
-          </em>
-        </span>
+        ))}
       </h1>
 
       {/* Subtitle */}
-      <p
+      <motion.p
+        variants={fadeUp(0.8)}
+        initial="hidden"
+        animate="visible"
         style={{
           fontFamily: "'Syne'",
           fontSize: "clamp(14px, 2.5vw, 17px)",
           lineHeight: 1.75,
           color: c.fgMuted,
-          maxWidth: 400,
+          maxWidth: 520,
           margin: "36px 0 0",
-          opacity: loaded ? 1 : 0,
-          transform: loaded ? "translateY(0)" : "translateY(24px)",
-          transition: "all 0.9s cubic-bezier(0.22,1,0.36,1) 0.7s",
         }}
       >
         {HERO.subtitle}
         <br />
         {HERO.subtitleLine2}
-      </p>
+      </motion.p>
 
       {/* Scroll indicator */}
-      <div
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.25 }}
+        transition={{ duration: 0.8, delay: 1.4, ease: "easeOut" }}
         style={{
           position: "absolute",
           bottom: 32,
@@ -130,31 +124,34 @@ export default function Hero({ colors, loaded }) {
           display: "flex",
           alignItems: "center",
           gap: 12,
-          opacity: loaded ? 0.25 : 0,
-          transition: "all 0.8s ease 1.2s",
-          animation: loaded ? "float 3s ease-in-out infinite 2s" : "none",
         }}
       >
-        <div
-          style={{
-            width: 1,
-            height: 48,
-            background: `linear-gradient(to bottom, ${c.fg}, transparent)`,
-          }}
-        />
-        <span
-          style={{
-            fontFamily: "'Fira Code', monospace",
-            fontSize: 9,
-            letterSpacing: 2,
-            textTransform: "uppercase",
-            color: c.fgMuted,
-            writingMode: "vertical-rl",
-          }}
+        <motion.div
+          animate={{ y: [0, -8, 0] }}
+          transition={{ duration: 3, ease: "easeInOut", repeat: Infinity, delay: 2 }}
+          style={{ display: "flex", alignItems: "center", gap: 12 }}
         >
-          Scroll
-        </span>
-      </div>
+          <div
+            style={{
+              width: 1,
+              height: 48,
+              background: `linear-gradient(to bottom, ${c.fg}, transparent)`,
+            }}
+          />
+          <span
+            style={{
+              fontFamily: "'Fira Code', monospace",
+              fontSize: 9,
+              letterSpacing: 2,
+              textTransform: "uppercase",
+              color: c.fgMuted,
+              writingMode: "vertical-rl",
+            }}
+          >
+            Scroll
+          </span>
+        </motion.div>
+      </motion.div>
     </section>
   );
 }

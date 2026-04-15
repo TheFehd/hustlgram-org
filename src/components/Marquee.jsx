@@ -1,26 +1,26 @@
-import { useInView } from "../hooks/useInView";
+import { motion } from "framer-motion";
 import { MARQUEE_ITEMS } from "../constants/content";
 
 export default function Marquee({ colors }) {
   const c = colors;
-  const [ref, visible] = useInView(0.15);
 
   return (
-    <div
-      ref={ref}
+    <motion.div
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.8 }}
       style={{
         padding: "48px 0",
         borderTop: `1px solid ${c.border}`,
         borderBottom: `1px solid ${c.border}`,
         overflow: "hidden",
-        opacity: visible ? 1 : 0,
-        transition: "opacity 0.8s",
       }}
     >
       <div
         style={{
           display: "flex",
-          animation: "marquee 25s linear infinite",
+          animation: "marquee 30s linear infinite",
           whiteSpace: "nowrap",
         }}
       >
@@ -56,6 +56,6 @@ export default function Marquee({ colors }) {
           </div>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }
